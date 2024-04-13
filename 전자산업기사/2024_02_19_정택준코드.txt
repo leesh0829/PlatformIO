@@ -1,0 +1,69 @@
+#include <Arduino.h>
+
+int fnd_num[10][4] = {
+  {0,0,0,0},
+  {0,0,0,1},
+  {0,0,1,0},
+  {0,0,1,1},
+  {0,1,0,0},
+  {0,1,0,1},
+  {0,1,1,0},
+  {0,1,1,1},
+  {1,0,0,0},
+  {1,0,0,1}
+};
+
+void display_num(int num){
+  int ten = num/10;
+  int one = num%10;
+  for(int i=0; i<25; i++){
+    digitalWrite(18, 1);
+    digitalWrite(19, 0);
+    digitalWrite(14, fnd_num[ten][3]);
+    digitalWrite(15, fnd_num[ten][2]);
+    digitalWrite(16, fnd_num[ten][1]);
+    digitalWrite(17, fnd_num[ten][0]);
+    delay(5);
+    digitalWrite(18, 0);
+    digitalWrite(19, 1);
+    digitalWrite(14, fnd_num[one][3]);
+    digitalWrite(15, fnd_num[one][2]);
+    digitalWrite(16, fnd_num[one][1]);
+    digitalWrite(17, fnd_num[one][0]);
+    delay(5);
+  }
+}
+
+void setup() {
+  for(int i=2; i<6; i++){
+    pinMode(i, OUTPUT);
+    digitalWrite(i, 1);
+  }
+  for(int i=14; i<18; i++){
+    pinMode(i, OUTPUT);
+    digitalWrite(i, 1);
+  }
+  pinMode(18, OUTPUT);
+  pinMode(19, OUTPUT);
+  digitalWrite(18, 0);
+  digitalWrite(19, 0);
+  for(int i=0; i<8; i++)
+    display_num(88);
+  digitalWrite(18, 0);
+  digitalWrite(19, 0);
+  delay(1000);
+}
+
+void loop() {
+  int ar = analogRead(A0);
+  int m = map(ar, 120, 1024, 99, 0);
+  display_num(m);
+  display_num(m);
+  int ten = m/10; 
+  digitalWrite(2, !fnd_num[ten][0]);
+  digitalWrite(3, !fnd_num[ten][1]);
+  digitalWrite(4, !fnd_num[ten][2]);
+  digitalWrite(5, !fnd_num[ten][3]);
+  display_num(m);
+  display_num(m);
+}

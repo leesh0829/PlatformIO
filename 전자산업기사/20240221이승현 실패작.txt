@@ -1,0 +1,117 @@
+#include <Arduino.h>
+
+int fnd[10][4] =
+{
+  {0, 0, 0, 0},
+  {0, 0, 0, 1},
+  {0, 0, 1, 0},
+  {0, 0, 1, 1},
+  {0, 1, 0, 0},
+  {0, 1, 0, 1},
+  {0, 1, 1, 0},
+  {0, 1, 1, 1},
+  {1, 0, 0, 0},
+  {1, 0, 0, 1}
+};
+
+void fnd_num(int num, int time)
+{
+  int ten = num / 10;
+  int one = num % 10;
+
+  for(int i = 0; i < time; i++)
+  {
+    digitalWrite(18, 0);
+    digitalWrite(19, 1);
+    digitalWrite(14, fnd[ten][3]);
+    digitalWrite(15, fnd[ten][2]);
+    digitalWrite(16, fnd[ten][1]);
+    digitalWrite(17, fnd[ten][0]);
+    delay(2);
+
+    digitalWrite(18, 1);
+    digitalWrite(19, 0);
+    digitalWrite(14, fnd[one][3]);
+    digitalWrite(15, fnd[one][2]);
+    digitalWrite(16, fnd[one][1]);
+    digitalWrite(17, fnd[one][0]);
+    delay(2);
+  }
+}
+
+void setup() {
+  for(int i = 2; i < 21; i++) pinMode(i, OUTPUT);
+
+  for(int j = 0; j < 6; j++)  digitalWrite(j, 1);
+
+  fnd_num(88, 250);
+  digitalWrite(18, 1);
+  digitalWrite(19, 1);
+
+  Serial.begin(9800);
+}
+
+int led_value[10] = {255, 200, 175, 150, 125, 100, 75, 50, 25, 0};
+
+int siu = 0;
+int siuu = 0;
+int up = 0;
+int down = 0;
+int count1 = 0;
+int count2 = 98;
+int count3 = 1;
+int count4 = 99;
+
+void loop() {
+
+
+  /* count1 ++;
+  fnd_num(count1, 500);
+  if(count1 > 99) count1 = 0; */
+
+  siu = analogRead(A0);
+  
+  siuu = map(siu, 200, 900, 99, 0);
+
+  Serial.println(siuu);
+
+  if(siuu < 25)
+  {
+    digitalWrite(5, 1);
+    digitalWrite(4, 1);
+    count1 = count1 +2;
+    fnd_num(count1, 125);
+    if(count1 > 98) count1 = 0;
+    analogWrite(2, led_value[siuu/10]);
+  }
+
+  else if(siuu > 24 && siuu  < 51)
+  {
+    digitalWrite(5, 1);
+    digitalWrite(4, 0);
+    count2 = count2 -2;
+    fnd_num(count2, 125);
+    if(count1 < 0) count1 = 98;
+    analogWrite(2, led_value[siuu/10]);
+  }
+
+  else if(siuu > 49 && siuu  < 76)
+  {
+    digitalWrite(5, 0);
+    digitalWrite(4, 1);
+    count3 = count3 +2;
+    fnd_num(count3, 125);
+    if(count3 > 99) count3 = 1;
+    analogWrite(2, led_value[siuu/10]);
+  }
+
+  else if(siuu > 74 && siuu  < 100)
+  {
+    digitalWrite(5, 0);
+    digitalWrite(4, 0);
+    count4 = count4 -2;
+    fnd_num(count4, 125);
+    if(count4 < 1) count4 = 99;
+    analogWrite(2, led_value[siuu/10]);
+  }
+}

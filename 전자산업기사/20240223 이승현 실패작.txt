@@ -1,0 +1,175 @@
+#include <Arduino.h>
+
+int led_value[10] = {0, 25, 50, 75, 100, 125, 150, 175, 200, 255};
+
+int fnd[10][4] = 
+{
+  {0, 0, 0, 0},
+  {0, 0, 0, 1},
+  {0, 0, 1, 0},
+  {0, 0, 1, 1},
+  {0, 1, 0, 0},
+  {0, 1, 0, 1},
+  {0, 1, 1, 0},
+  {0, 1, 1, 1},
+  {1, 0, 0, 0},
+  {1, 0, 0, 1}
+};
+
+void fnd_num(int num, int time)
+{
+  int ten = num/10;
+  int one = num%10;
+
+  for(int i = 0; i < time; i++)
+  {
+    digitalWrite(18, 1);
+    digitalWrite(19, 0);
+
+    digitalWrite(14, fnd[ten][3]);
+    digitalWrite(15, fnd[ten][2]);
+    digitalWrite(16, fnd[ten][1]);
+    digitalWrite(17, fnd[ten][0]);
+    delay(2);
+
+    digitalWrite(18, 0);
+    digitalWrite(19, 1);
+
+    digitalWrite(14, fnd[one][3]);
+    digitalWrite(15, fnd[one][2]);
+    digitalWrite(16, fnd[one][1]);
+    digitalWrite(17, fnd[one][0]);
+    delay(2);
+  }
+}
+
+void setup() {
+  for(int i = 2; i < 20; i++) pinMode(i, OUTPUT);
+
+  for(int j = 2; j < 7; j++)  digitalWrite(j, 1);
+
+  fnd_num(00, 250);
+  Serial.begin(9600);
+}
+
+int siuu = 0;
+int siu = 0;
+
+int count = 0;
+int up = 0;
+int down = 0;
+int stop = 0;
+
+void blink(int num)
+{
+    fnd_num(num, 500);
+
+    digitalWrite(18, 1);
+    digitalWrite(19, 1);
+}
+
+void loop() {
+  siu = analogRead(A0);
+
+  siuu = map(siu, 400 , 1000, 0, 3);
+
+  Serial.println(siuu);
+
+  if(siu == 0 && up == 0 && down == 0)
+  {
+    digitalWrite(5, 1);
+    digitalWrite(4, 1);
+    digitalWrite(3, 1);
+    digitalWrite(2, 1);    
+
+    blink(0);
+  }
+
+  if(siu == 1 && up == 0 && down == 0 && stop == 0)
+  {
+    up = 1;
+    down = 0;
+    stop = 0;
+
+    blink(count);
+    blink(count);
+  }
+
+  if(siu == 2 && up == 1 && down == 0 && stop == 0)
+  {
+    up = 0;
+    down = 1;
+    stop = 0;
+
+    blink(count);
+    blink(count);
+  }
+
+  if(siu == 3 && up == 0 && down == 1 && stop == 0)
+  {
+    up = 1;
+    down = 0;
+    stop = 0;
+
+    blink(count);
+    blink(count);
+  }
+
+  if(siu == 0 && (up == 1 || down == 1) && stop == 0)
+  {
+    up = 0;
+    down = 0;
+    stop = 1;
+
+    digitalWrite(5, 1);
+    digitalWrite(4, 1);
+
+    blink(count);
+    analogWrite(3, led_value[count/10]);
+    analogWrite(2, led_value[count/10]);
+  }
+
+  if(siu == 1 && up == 1)
+  {
+    digitalWrite(5, 1);
+    digitalWrite(4, 1);
+
+    count++;
+    fnd_num(count, 500);
+    if(count > 99)  count = 0;
+  }
+
+  if(siu == 2 && down == 1)
+  {
+    digitalWrite(5, 0);
+    digitalWrite(4, 1);
+
+    count--;
+    fnd_num(count, 500);
+    if(count < 0) count = 99;
+  }
+  
+  if(siu == 3 && up == 1)
+  {
+    digitalWrite(5, 1);
+    digitalWrite(4, 0);
+
+    count++;
+    fnd_num(count ,500);
+    if(count > 99)  count = 0;
+  }
+
+  if(stop == 1 && siu == 0)
+  {
+    digitalWrite(5, 1);
+    digitalWrite(4, 1);
+    digitalWrite(3, 1);
+    digitalWrite(2, 1);
+
+    blink(0);
+  }
+
+  /*count++;
+  fnd_num(count, 100);
+  if(count > 99)  count = 0;*/
+}

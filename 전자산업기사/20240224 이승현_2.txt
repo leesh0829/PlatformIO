@@ -1,0 +1,95 @@
+#include <Arduino.h>
+
+int fnd[10][4] = {
+  {0, 0, 0, 0},
+  {0, 0, 0, 1},
+  {0, 0, 1, 0},
+  {0, 0, 1, 1},
+  {0, 1, 0, 0},
+  {0, 1, 0, 1},
+  {0, 1, 1, 0},
+  {0, 1, 1, 1},
+  {1, 0, 0, 0},
+  {1, 0, 0, 1}
+};
+
+int led_value[10] = {255, 200, 175, 150, 125, 100, 75, 50, 25, 0};
+
+void fnd_num(int num, int time)
+{
+  int ten = num / 10;
+  int one = num % 10;
+
+  for(int i = 0; i < time / 20; i ++)
+  {
+    digitalWrite(18, 1);
+    digitalWrite(19, 0);
+    digitalWrite(14, fnd[ten][3]);
+    digitalWrite(15, fnd[ten][2]);
+    digitalWrite(16, fnd[ten][1]);
+    digitalWrite(17, fnd[ten][0]);
+    delay(10);
+
+    digitalWrite(18, 0);
+    digitalWrite(19, 1);
+    digitalWrite(14, fnd[one][3]);
+    digitalWrite(15, fnd[one][2]);
+    digitalWrite(16, fnd[one][1]);
+    digitalWrite(17, fnd[one][0]);
+    delay(10);
+  }
+}
+
+int siu = 0;
+int siuu = 0;
+int cnt = 0;
+
+void blink()
+{
+  fnd_num(siuu, 500);
+  digitalWrite(5, 0);
+  digitalWrite(4, 0);
+  fnd_num(siuu, 500);
+  digitalWrite(5, 1);
+  digitalWrite(4, 1);
+}
+
+void setup() {
+  digitalWrite(2, 1);
+  digitalWrite(3, 1);
+  digitalWrite(4, 1);
+  digitalWrite(5, 1);
+  Serial.begin(9600);
+
+  for(int i = 0; i < 21; i++) pinMode(i, OUTPUT);
+
+  fnd_num(0, 2000);
+}
+
+void loop() {
+  
+  digitalWrite(5, 1);
+  digitalWrite(4, 1);
+
+  siu = analogRead(A0);
+
+  siuu = map(siu, 400, 900, 0, 99);
+
+  Serial.println(siuu);
+
+  analogWrite(2, led_value[siuu/10]);
+
+  if(siuu < 50)
+  {
+    blink();
+  }
+
+   fnd_num(siuu, 500);
+  
+
+  
+  /*
+  fnd_num(cnt, 500);
+  cnt++;
+  if(cnt > 99)  cnt = 0; */
+}
